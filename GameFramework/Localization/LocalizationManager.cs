@@ -201,7 +201,17 @@ namespace GameFramework.Localization
         /// <param name="dictionaryAssetName">字典资源名称。</param>
         public void LoadDictionary(string dictionaryAssetName)
         {
-            LoadDictionary(dictionaryAssetName, null);
+            LoadDictionary(dictionaryAssetName, Constant.DefaultPriority, null);
+        }
+
+        /// <summary>
+        /// 加载字典。
+        /// </summary>
+        /// <param name="dictionaryAssetName">字典资源名称。</param>
+        /// <param name="priority">加载字典资源的优先级。</param>
+        public void LoadDictionary(string dictionaryAssetName, int priority)
+        {
+            LoadDictionary(dictionaryAssetName, priority, null);
         }
 
         /// <summary>
@@ -210,6 +220,17 @@ namespace GameFramework.Localization
         /// <param name="dictionaryAssetName">字典资源名称。</param>
         /// <param name="userData">用户自定义数据。</param>
         public void LoadDictionary(string dictionaryAssetName, object userData)
+        {
+            LoadDictionary(dictionaryAssetName, Constant.DefaultPriority, userData);
+        }
+
+        /// <summary>
+        /// 加载字典。
+        /// </summary>
+        /// <param name="dictionaryAssetName">字典资源名称。</param>
+        /// <param name="priority">加载字典资源的优先级。</param>
+        /// <param name="userData">用户自定义数据。</param>
+        public void LoadDictionary(string dictionaryAssetName, int priority, object userData)
         {
             if (m_ResourceManager == null)
             {
@@ -221,7 +242,7 @@ namespace GameFramework.Localization
                 throw new GameFrameworkException("You must set localization helper first.");
             }
 
-            m_ResourceManager.LoadAsset(dictionaryAssetName, m_LoadAssetCallbacks, userData);
+            m_ResourceManager.LoadAsset(dictionaryAssetName, priority, m_LoadAssetCallbacks, userData);
         }
 
         /// <summary>
@@ -254,6 +275,117 @@ namespace GameFramework.Localization
         /// 根据字典主键获取字典内容字符串。
         /// </summary>
         /// <param name="key">字典主键。</param>
+        /// <returns>要获取的字典内容字符串。</returns>
+        public string GetString(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new GameFrameworkException("Key is invalid.");
+            }
+
+            string value = null;
+            if (!m_Dictionary.TryGetValue(key, out value))
+            {
+                return Utility.Text.Format("<NoKey>{0}", key);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// 根据字典主键获取字典内容字符串。
+        /// </summary>
+        /// <param name="key">字典主键。</param>
+        /// <param name="arg0">字典参数 0。</param>
+        /// <returns>要获取的字典内容字符串。</returns>
+        public string GetString(string key, object arg0)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new GameFrameworkException("Key is invalid.");
+            }
+
+            string value = null;
+            if (!m_Dictionary.TryGetValue(key, out value))
+            {
+                return Utility.Text.Format("<NoKey>{0}", key);
+            }
+
+            try
+            {
+                return Utility.Text.Format(value, arg0);
+            }
+            catch (Exception exception)
+            {
+                return Utility.Text.Format("<Error>{0},{1},{2},{3}", key, value, arg0, exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// 根据字典主键获取字典内容字符串。
+        /// </summary>
+        /// <param name="key">字典主键。</param>
+        /// <param name="arg0">字典参数 0。</param>
+        /// <param name="arg1">字典参数 1。</param>
+        /// <returns>要获取的字典内容字符串。</returns>
+        public string GetString(string key, object arg0, object arg1)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new GameFrameworkException("Key is invalid.");
+            }
+
+            string value = null;
+            if (!m_Dictionary.TryGetValue(key, out value))
+            {
+                return Utility.Text.Format("<NoKey>{0}", key);
+            }
+
+            try
+            {
+                return Utility.Text.Format(value, arg0, arg1);
+            }
+            catch (Exception exception)
+            {
+                return Utility.Text.Format("<Error>{0},{1},{2},{3},{4}", key, value, arg0, arg1, exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// 根据字典主键获取字典内容字符串。
+        /// </summary>
+        /// <param name="key">字典主键。</param>
+        /// <param name="arg0">字典参数 0。</param>
+        /// <param name="arg1">字典参数 1。</param>
+        /// <param name="arg2">字典参数 2。</param>
+        /// <returns>要获取的字典内容字符串。</returns>
+        public string GetString(string key, object arg0, object arg1, object arg2)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new GameFrameworkException("Key is invalid.");
+            }
+
+            string value = null;
+            if (!m_Dictionary.TryGetValue(key, out value))
+            {
+                return Utility.Text.Format("<NoKey>{0}", key);
+            }
+
+            try
+            {
+                return Utility.Text.Format(value, arg0, arg1, arg2);
+            }
+            catch (Exception exception)
+            {
+                return Utility.Text.Format("<Error>{0},{1},{2},{3},{4},{5}", key, value, arg0, arg1, arg2, exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// 根据字典主键获取字典内容字符串。
+        /// </summary>
+        /// <param name="key">字典主键。</param>
         /// <param name="args">字典参数。</param>
         /// <returns>要获取的字典内容字符串。</returns>
         public string GetString(string key, params object[] args)
@@ -266,16 +398,16 @@ namespace GameFramework.Localization
             string value = null;
             if (!m_Dictionary.TryGetValue(key, out value))
             {
-                return string.Format("<NoKey>{0}", key);
+                return Utility.Text.Format("<NoKey>{0}", key);
             }
 
             try
             {
-                return string.Format(value, args);
+                return Utility.Text.Format(value, args);
             }
             catch (Exception exception)
             {
-                string errorString = string.Format("<Error>{0},{1}", key, value);
+                string errorString = Utility.Text.Format("<Error>{0},{1}", key, value);
                 if (args != null)
                 {
                     foreach (object arg in args)
@@ -322,7 +454,7 @@ namespace GameFramework.Localization
                 return value;
             }
 
-            return string.Format("<NoKey>{0}", key);
+            return Utility.Text.Format("<NoKey>{0}", key);
         }
 
         /// <summary>
@@ -363,7 +495,7 @@ namespace GameFramework.Localization
             {
                 if (!m_LocalizationHelper.LoadDictionary(dictionaryAsset, userData))
                 {
-                    throw new GameFrameworkException(string.Format("Load dictionary failure in helper, asset name '{0}'.", dictionaryAssetName));
+                    throw new GameFrameworkException(Utility.Text.Format("Load dictionary failure in helper, asset name '{0}'.", dictionaryAssetName));
                 }
             }
             catch (Exception exception)
@@ -389,7 +521,7 @@ namespace GameFramework.Localization
 
         private void LoadDictionaryFailureCallback(string dictionaryAssetName, LoadResourceStatus status, string errorMessage, object userData)
         {
-            string appendErrorMessage = string.Format("Load dictionary failure, asset name '{0}', status '{1}', error message '{2}'.", dictionaryAssetName, status.ToString(), errorMessage);
+            string appendErrorMessage = Utility.Text.Format("Load dictionary failure, asset name '{0}', status '{1}', error message '{2}'.", dictionaryAssetName, status.ToString(), errorMessage);
             if (m_LoadDictionaryFailureEventHandler != null)
             {
                 m_LoadDictionaryFailureEventHandler(this, new LoadDictionaryFailureEventArgs(dictionaryAssetName, appendErrorMessage, userData));

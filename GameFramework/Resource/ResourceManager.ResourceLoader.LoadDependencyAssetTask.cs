@@ -15,8 +15,8 @@ namespace GameFramework.Resource
             {
                 private readonly LoadResourceTaskBase m_MainTask;
 
-                public LoadDependencyAssetTask(string assetName, ResourceInfo resourceInfo, string[] dependencyAssetNames, string[] scatteredDependencyAssetNames, string resourceChildName, LoadResourceTaskBase mainTask, object userData)
-                    : base(assetName, resourceInfo, dependencyAssetNames, scatteredDependencyAssetNames, resourceChildName, userData)
+                public LoadDependencyAssetTask(string assetName, int priority, ResourceInfo resourceInfo, string resourceChildName, string[] dependencyAssetNames, string[] scatteredDependencyAssetNames, LoadResourceTaskBase mainTask, object userData)
+                    : base(assetName, null, priority, resourceInfo, resourceChildName, dependencyAssetNames, scatteredDependencyAssetNames, userData)
                 {
                     m_MainTask = mainTask;
                     m_MainTask.TotalDependencyAssetCount++;
@@ -39,7 +39,7 @@ namespace GameFramework.Resource
                 public override void OnLoadAssetFailure(LoadResourceAgent agent, LoadResourceStatus status, string errorMessage)
                 {
                     base.OnLoadAssetFailure(agent, status, errorMessage);
-                    m_MainTask.OnLoadAssetFailure(agent, LoadResourceStatus.DependencyError, string.Format("Can not load dependency asset '{0}', internal status '{1}', internal error message '{2}'.", AssetName, status.ToString(), errorMessage));
+                    m_MainTask.OnLoadAssetFailure(agent, LoadResourceStatus.DependencyError, Utility.Text.Format("Can not load dependency asset '{0}', internal status '{1}', internal error message '{2}'.", AssetName, status.ToString(), errorMessage));
                 }
             }
         }
