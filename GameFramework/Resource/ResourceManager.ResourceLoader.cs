@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------
-// Game Framework v3.x
-// Copyright © 2013-2018 Jiang Yin. All rights reserved.
+// Game Framework
+// Copyright © 2013-2019 Jiang Yin. All rights reserved.
 // Homepage: http://gameframework.cn/
 // Feedback: mailto:jiangyin@gameframework.cn
 //------------------------------------------------------------
@@ -20,7 +20,8 @@ namespace GameFramework.Resource
         {
             private readonly ResourceManager m_ResourceManager;
             private readonly TaskPool<LoadResourceTaskBase> m_TaskPool;
-            private readonly Dictionary<object, int> m_DependencyCount;
+            private readonly Dictionary<object, int> m_AssetDependencyCount;
+            private readonly Dictionary<object, int> m_ResourceDependencyCount;
             private readonly Dictionary<string, object> m_SceneToAssetMap;
             private IObjectPool<AssetObject> m_AssetPool;
             private IObjectPool<ResourceObject> m_ResourcePool;
@@ -33,7 +34,8 @@ namespace GameFramework.Resource
             {
                 m_ResourceManager = resourceManager;
                 m_TaskPool = new TaskPool<LoadResourceTaskBase>();
-                m_DependencyCount = new Dictionary<object, int>();
+                m_AssetDependencyCount = new Dictionary<object, int>();
+                m_ResourceDependencyCount = new Dictionary<object, int>();
                 m_SceneToAssetMap = new Dictionary<string, object>();
                 m_AssetPool = null;
                 m_ResourcePool = null;
@@ -219,7 +221,8 @@ namespace GameFramework.Resource
             public void Shutdown()
             {
                 m_TaskPool.Shutdown();
-                m_DependencyCount.Clear();
+                m_AssetDependencyCount.Clear();
+                m_ResourceDependencyCount.Clear();
                 m_SceneToAssetMap.Clear();
             }
 
@@ -450,13 +453,7 @@ namespace GameFramework.Resource
                     return false;
                 }
 
-                int childNamePosition = assetName.LastIndexOf('/');
-                if (childNamePosition + 1 >= assetName.Length)
-                {
-                    return false;
-                }
-
-                resourceChildName = assetName.Substring(childNamePosition + 1);
+                resourceChildName = assetInfo.Value.ResourceChildName;
 
                 AssetDependencyInfo? assetDependencyInfo = m_ResourceManager.GetAssetDependencyInfo(assetName);
                 if (assetDependencyInfo.HasValue)
@@ -473,9 +470,9 @@ namespace GameFramework.Resource
                 switch ((LoadType)loadType)
                 {
                     case LoadType.LoadFromMemoryAndQuickDecrypt:
-                        return Utility.Encryption.GetQuickXorBytes(bytes, Utility.Converter.GetBytes(hashCode));
+                        return Utility.Encryption.GetQuickSelfXorBytes(bytes, Utility.Converter.GetBytes(hashCode));
                     case LoadType.LoadFromMemoryAndDecrypt:
-                        return Utility.Encryption.GetXorBytes(bytes, Utility.Converter.GetBytes(hashCode));
+                        return Utility.Encryption.GetSelfXorBytes(bytes, Utility.Converter.GetBytes(hashCode));
                     default:
                         return bytes;
                 }
