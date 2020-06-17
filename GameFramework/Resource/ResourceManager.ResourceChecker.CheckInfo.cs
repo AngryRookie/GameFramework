@@ -1,15 +1,15 @@
 ﻿//------------------------------------------------------------
 // Game Framework
-// Copyright © 2013-2019 Jiang Yin. All rights reserved.
-// Homepage: http://gameframework.cn/
-// Feedback: mailto:jiangyin@gameframework.cn
+// Copyright © 2013-2020 Jiang Yin. All rights reserved.
+// Homepage: https://gameframework.cn/
+// Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 
 namespace GameFramework.Resource
 {
-    internal partial class ResourceManager
+    internal sealed partial class ResourceManager : GameFrameworkModule, IResourceManager
     {
-        private partial class ResourceChecker
+        private sealed partial class ResourceChecker
         {
             /// <summary>
             /// 资源检查信息。
@@ -82,7 +82,7 @@ namespace GameFramework.Resource
                 }
 
                 /// <summary>
-                /// 获取压缩包大小。
+                /// 获取压缩后大小。
                 /// </summary>
                 public int ZipLength
                 {
@@ -93,7 +93,7 @@ namespace GameFramework.Resource
                 }
 
                 /// <summary>
-                /// 获取压缩包哈希值。
+                /// 获取压缩后哈希值。
                 /// </summary>
                 public int ZipHashCode
                 {
@@ -131,8 +131,8 @@ namespace GameFramework.Resource
                 /// <param name="loadType">资源加载方式。</param>
                 /// <param name="length">资源大小。</param>
                 /// <param name="hashCode">资源哈希值。</param>
-                /// <param name="zipLength">压缩包大小。</param>
-                /// <param name="zipHashCode">压缩包哈希值。</param>
+                /// <param name="zipLength">压缩后大小。</param>
+                /// <param name="zipHashCode">压缩后哈希值。</param>
                 public void SetVersionInfo(LoadType loadType, int length, int hashCode, int zipLength, int zipHashCode)
                 {
                     if (m_VersionInfo.Exist)
